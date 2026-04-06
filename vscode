@@ -1,0 +1,10 @@
+systemctl stop packagekit
+sleep 1
+killall packagekitd
+sleep 1
+rpm --import https://packages.microsoft.com/keys/microsoft.asc
+zypper ar https://packages.microsoft.com/yumrepos/vscode vscode
+zypper refresh
+zypper install -y code
+code --install-extension ms-python.python --user-data-dir=".vscode"
+code --install-extension golang.go --user-data-dir=".vscode"
