@@ -1,0 +1,54 @@
+systemctl stop packagekit
+sleep 1
+killall packagekitd
+sleep 1
+ps aux | grep package
+zypper in -y ripgrep git gcc
+curl -LO https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz
+rm -rf /opt/nvim
+tar -C /opt -xzf nvim-linux-x86_64.tar.gz
+ln -s /opt/nvim-linux-x86_64/bin/nvim /usr/bin/nvim
+git clone https://github.com/LazyVim/starter ~/.config/nvim
+echo "*** INSTALLED ***"
+cat <<EOF
+Сейчас запусти nvim и выполни  :Lazy sync
+# Hotkeys
+🧭 Меню всех команд
+    Space
+🔍 Поиск (через Telescope.nvim)
+    Space + f + f → найти файлы
+    Space + f + g → поиск по тексту (grep)
+    Space + f + b → буферы
+    Space + f + h → help
+🌳 Файлы и навигация
+    Space + e → открыть дерево (neo-tree)
+    Space + w → сохранить файл
+    Space + q → закрыть
+🧠 LSP (умный код)
+    gd → перейти к определению
+    gr → найти ссылки (references)
+    K → документация
+    Space + c + a → code actions
+    Space + c + r → rename
+    Space + c + d → диагностика
+📄 Буферы
+    Shift + h → предыдущий файл
+    Shift + l → следующий файл
+    Space + b + d → закрыть буфер
+    Space + b + o → закрыть остальные
+🪟 Окна (splits)
+    Ctrl + h/j/k/l → переключение между окнами
+    Space + | → вертикальный split
+    Space + - → горизонтальный split
+🧪 Терминал
+    Ctrl + / → открыть встроенный терминал
+    Esc Esc → выйти из терминала
+⚡ Быстрые действия
+    Space + / → поиск по текущему файлу
+    Space + s + s → глобальный поиск
+    Space + u + f → toggle форматирование
+🧰 Git
+    Space + g + g → открыть lazygit (если установлен)
+    Space + g + b → blame
+    Space + g + d → diff
+EOF
