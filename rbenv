@@ -1,0 +1,23 @@
+systemctl stop packagekit
+sleep 1
+killall packagekitd
+sleep 1
+zypper in -y gcc gcc-c++ curl make git tar
+zypper in -y zlib zlib-devel
+zypper in -y libopenssl-devel autoconf bison libyaml-devel libffi-devel
+curl -fsSL https://github.com/rbenv/rbenv-installer/raw/HEAD/bin/rbenv-installer | bash
+echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc # rbenv is always in ~/.rbenv
+echo 'export PATH="/usr/lib64/ruby/gems/bin:$PATH"' >> ~/.bashrc # but we install rails in here
+echo 'export GEM_HOME=/usr/lib64/ruby/gems/' >> ~/.bashrc
+echo 'export GEM_PATH=/usr/lib64/ruby/gems/' >> ~/.bashrc
+echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+. ~/.bashrc
+rbenv install -l
+export NEWEST_VERSION=$(rbenv install -l | sort -n -r | head -n 1)
+echo "Installing ruby-${NEWEST_VERSION}"
+rbenv install ${NEWEST_VERSION}
+rbenv global ${NEWEST_VERSION}
+ruby -v
+gem install bundler
+zypper in -y nodejs-default nodejs-devel-default
+
