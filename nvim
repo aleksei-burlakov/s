@@ -8,6 +8,7 @@ curl -LO https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x8
 rm -rf /opt/nvim
 tar -C /opt -xzf nvim-linux-x86_64.tar.gz
 ln -s /opt/nvim-linux-x86_64/bin/nvim /usr/bin/nvim
+rm nvim-linux-x86_64.tar.gz
 git clone https://github.com/LazyVim/starter ~/.config/nvim
 echo "*** INSTALLED ***"
 cat <<EOF

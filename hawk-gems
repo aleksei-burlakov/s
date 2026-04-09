@@ -1,0 +1,37 @@
+curl -fssL github.com/aleksei-burlakov/s/raw/main/rbenv | bash  # myinstall might not be defined
+. ~/.bashrc  # to refresh rbenv
+
+zypper in -y hawk2
+cd /usr/share/hawk
+rm Gemfile.lock
+echo "source 'https://rubygems.org'" > Gemfile.tmp
+echo "" >> Gemfile.tmp
+cat Gemfile >> Gemfile.tmp
+mv Gemfile.tmp Gemfile
+
+export GEM_HOME=$PWD/vendor
+bundle config set force_ruby_platform true
+bundle lock --add-platform ruby
+bundle install
+ls vendor/cache
+
+zypper in -y osc
+cd ~
+mkdir Packages
+cd Packages
+osc co network:ha-clustering:Factory/hawk2
+cd network:ha-clustering:Factory/hawk2
+osc rm *.gem
+cp /usr/share/hawk/vendor/cache/*.gem .
+osc add *.gem
+
+sed -i '/+++ b\/hawk\/Gemfile.lock$/q' gemfile-lock.patch
+diff -u /dev/null /usr/share/hawk/Gemfile.lock --color=auto | tail -n +3 >> gemfile-lock.patch
+
+cat <<EOF
+Дальше не автоматизировано...
+# ls -1 *.gem | sort | awk '{printf "Source%d:        %s\n", NR+1, $0}' # скопируешь это в spec
+# vim hawk2.spec  # 1) подмени gem файлы 2) подправь секцию %files руками
+# osc vc
+# osc commit
+EOF
