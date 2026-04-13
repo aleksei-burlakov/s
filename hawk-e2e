@@ -1,0 +1,19 @@
+curl -fsSL github.com/aleksei-burlakov/s/raw/main/vscode | bash
+
+. ./bashrc
+zypper rm -y MozillaFirefox-branding-openSUSE-68-5.3.x86_64
+zypper in -y MozillaFirefox MozillaFirefox-branding-upstream chromium file \
+   python3-paramiko python3-PyVirtualDisplay python3-selenium python-rpm-packaging \
+   xauth xdpyinfo xorg-x11-fonts xorg-x11-Xvnc
+
+zypper in -y gzip tar wget
+wget -O- https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-linux64.tar.gz | tar zxf - -C /usr/local/bin/
+
+zypper in -y git
+mkdir -p ~/Workspace
+cd ~/Workspace
+git clone https://github.com/ClusterLabs/hawk
+cat <<EOF
+# cd Workspace/hawk/e2e
+# vscode . --no-sandbox --user-data-dir=".vscode"
+EOF
