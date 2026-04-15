@@ -1,0 +1,23 @@
+curl -fsSL github.com/aleksei-burlakov/s/raw/main/vscode-ubuntu | bash
+
+apt install -y python3-pyvirtualdisplay python3-packaging python3-selenium git
+wget -O- https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-linux64.tar.gz | tar zxf - -C /usr/local/bin/
+
+sudo snap remove firefox
+sudo add-apt-repository ppa:mozillateam/ppa -y
+sudo apt update
+echo '
+Package: *
+Pin: release o=LP-PPA-mozillateam
+Pin-Priority: 1001
+' | sudo tee /etc/apt/preferences.d/mozilla-firefox
+sudo apt install --allow-downgrades -y firefox
+
+mkdir -p ~/Workspace
+cd ~/Workspace
+git clone https://github.com/ClusterLabs/hawk
+cat <<EOF
+# su - hacluster # should be a non-root user
+# cd Workspace/hawk/e2e
+# code . --no-sandbox --user-data-dir=".vscode"
+EOF

@@ -15,5 +15,5 @@ cd ~/Workspace
 git clone https://github.com/ClusterLabs/hawk
 cat <<EOF
 # cd Workspace/hawk/e2e
-# vscode . --no-sandbox --user-data-dir=".vscode"
+# code . --no-sandbox --user-data-dir=".vscode"
 EOF
