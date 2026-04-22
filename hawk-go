@@ -1,0 +1,55 @@
+curl -fsSL github.com/aleksei-burlakov/s/raw/main/vscode | bash
+
+go install github.com/go-delve/delve/cmd/dlv@latest
+zypper in -y hawk2 git golang-packaging libpacemaker-devel libqb-devel libxml2-devel make
+
+mkdir -p ~/Workspace
+cd ~/Workspace
+git clone https://github.com/aleksei-burlakov/hawk-apiserver
+cd hawk-apiserver
+git checkout ver0.1.0
+mkdir .vscode
+
+tee .vscode/launch.json <<EOF
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "\${workspaceFolder}",
+            "dlvToolPath": "/usr/bin/dlv",
+            "args": [
+                "-key", "/etc/hawk/hawk.key",
+                "-cert", "/etc/hawk/hawk.pem",
+                "-port", "7630",
+                "-config", "/etc/hawk/server.json"
+            ]
+        }
+    ]
+}
+EOF
+
+# First, we need /etc/hawk/hawk.pem, and it's created by hawk.service
+crm cluster init -y
+crm configure primitive stonith-sbd ocf:pacemaker:Dummy
+# or simply `systemctl start hawk` to generate /etc/hawk/hawk.pem
+
+# Second, when there is /etc/hawk/hawk.pem we can remove the hawk.service
+systemctl stop hawk hawk-backend
+sed -i '/StopWhenUnneeded=true/d'  /usr/lib/systemd/system/hawk-backend.service
+rm  /usr/lib/systemd/system/hawk.service
+systemctl daemon-reload # optional, because hawk-backend was not starter
+systemctl start hawk-backend
+
+
+cat <<EOF
+# FYI: if you want to starh hawk-backend by hand
+cd /usr/share/hawk/config/
+GEM_HOME=/usr/libexec/hawk/vendor GEM_PATH=/usr/libexec/hawk/vendor:$(ruby -e 'print Gem.default_dir') /usr/libexec/hawk/vendor/bin/puma -C /usr/share/hawk/config/puma.rb
+EOF
