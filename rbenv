@@ -18,6 +18,6 @@ echo "Installing ruby-${NEWEST_VERSION}"
 rbenv install ${NEWEST_VERSION}
 rbenv global ${NEWEST_VERSION}
 ruby -v
-gem install bundler
+# gem install bundler # there is bundler already in rbenv
 zypper in -y nodejs-default nodejs-devel-default
 
