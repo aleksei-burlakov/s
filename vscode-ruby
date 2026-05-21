@@ -1,0 +1,17 @@
+systemctl stop packagekit
+sleep 1
+killall packagekitd
+sleep 1
+rpm --import https://packages.microsoft.com/keys/microsoft.asc
+zypper ar https://packages.microsoft.com/yumrepos/vscode vscode
+zypper refresh
+zypper install -y code
+code --install-extension koichisasada.vscode-rdbg --user-data-dir=".vscode"
+
+cat <<EOF
+You can also install rubylsp and code-runner, if there are problems with rdbg
+code --install-extension shopify.ruby-lsp --user-data-dir=".vscode" # linter
+code --install-extension formulahendry.code-runner --user-data-dir=".vscode" # runner
+code-runner is not a debugger, it doesn't support breakpoints and step-by-step 
+debugging. You can only run the code by ctrl+alt+n (or find the Play icon top right)
+EOF
