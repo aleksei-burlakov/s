@@ -2,9 +2,10 @@ systemctl stop packagekit
 sleep 1
 killall packagekitd
 sleep 1
-zypper in -y gcc gcc-c++ curl make git tar
-zypper in -y zlib zlib-devel
 zypper in -y libopenssl-devel autoconf bison libyaml-devel libffi-devel
+zypper rm -y zlib-ng-compat-devel
+zypper in -y zlib zlib-devel
+zypper in -y gcc gcc-c++ curl make git tar
 curl -fsSL https://github.com/rbenv/rbenv-installer/raw/HEAD/bin/rbenv-installer | bash
 echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc # rbenv is always in ~/.rbenv
 echo 'export PATH="/usr/lib64/ruby/gems/bin:$PATH"' >> ~/.bashrc # but we install rails in here

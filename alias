@@ -1,0 +1,28 @@
+echo 'alias iosc="osc -A https://api.suse.de"' >> ~/.alias
+echo 'alias eosc="osc -A https://api.opensuse.org"' >> ~/.alias
+echo 'alias ll="ls -lap --color=auto"' >> ~/.alias
+. ~/.alias
+
+tee -a ~/.bashrc <<EOF
+osc_build() {
+  pkg_dir=$1
+  shift
+  repo=$1
+  shift
+  osc build -x vim -k ../rpms/$pkg_dir -p ../rpms/$pkg_dir $repo x86_64 $@
+}
+
+ob-15.6() {
+  osc_build 15.6 openSUSE_Leap_15.6 $@
+}
+
+ob-16.0() {
+  osc_build 16.0 16.0 $@
+}
+
+ob-tw() {
+  osc_build tw openSUSE_Tumbleweed $@
+}
+EOF
+
+. ~/.bashrc
