@@ -1,0 +1,85 @@
+zypper in -y hawk2 git
+mkdir -p /root/Workspace
+
+sed -i 's|StopWhenUnneeded=true||' /usr/lib/systemd/system/hawk.service
+sed -i 's|User=hacluster||' /usr/lib/systemd/system/hawk.service
+sed -i 's|Group=haclient||' /usr/lib/systemd/system/hawk.service
+sed -i 's|HAWK_ENV=production|HAWK_ENV=development|' /usr/lib/systemd/system/hawk.service
+
+sed -i 's|StopWhenUnneeded=true||' /usr/lib/systemd/system/hawk-backend.service
+sed -i 's|User=hacluster||' /usr/lib/systemd/system/hawk-backend.service
+sed -i 's|Group=haclient||' /usr/lib/systemd/system/hawk-backend.service
+sed -i 's|HAWK_ENV=production|HAWK_ENV=development|' /usr/lib/systemd/system/hawk-backend.service
+
+sed -i 's|worker_timeout 60|worker_timeout 600|' /usr/share/hawk/config/puma.rb
+
+systemctl daemon-reload
+
+cd /usr/share/hawk/
+cat <<EOF | git apply
+diff --git a/app/lib/util.rb b/app/lib/util.rb
+index 46e016a..ee345fb 100644
+--- a/app/lib/util.rb
++++ b/app/lib/util.rb
+@@ -71,6 +71,7 @@ module Util
+   # Returns [stdout_str, stderr_str, status].  Pass :stdin_data => '...' if
+   # you need to send something to the command on stdin.
+   def capture3(*cmd)
++    File.write("/root/Workspace/qwerty.txt", "capture3: cmd=#{cmd}\n", mode: "a+")
+     if Hash === cmd.last
+       opts = cmd.pop.dup
+     else
+@@ -89,6 +90,7 @@ module Util
+   module_function :capture3
+ 
+   def run_as(user, pass, *cmd)
++    File.write("/root/Workspace/qwerty.txt", "run_as: cmd=#{cmd}, user=#{user}\n", mode: "a+")
+     if Hash === cmd.last
+       opts = cmd.pop.dup
+     else
+EOF
+
+if [ -e Gemfile ]; then
+  zypper in -y ruby4.0-rubygem-byebug
+  # the system ryby doesn't support byebug because it deosn't support readline
+  # but even after installing readline, puma will complain about it
+  # so it you want a working byebug use the 'rbenv' script
+  zypper in readline6-devel readline-devel
+  echo 'gem "byebug"' >> Gemfile
+  bundle install
+  tee config/runner.sh <<EOF
+GEM_HOME=/usr/libexec/hawk/vendor \
+GEM_PATH=/usr/libexec/hawk/vendor:$(ruby -e 'print Gem.default_dir') \
+HAWK_ENV=development \
+/usr/libexec/hawk/vendor/bin/puma -C /usr/share/hawk/config/puma.rb
+EOF
+  chmod +x config/runner.sh
+else
+  tee Gemfile <<EOF
+gem "rails", ">= 5.1"
+gem "puma", ">= 4.3.5"
+gem "sass-rails", ">= 5.0"
+gem "virtus", ">= 1.0.1"
+gem "js-routes", ">= 1.4.1"
+gem "fast_gettext", ">= 1.4"
+gem "gettext_i18n_rails", ">= 1.8"
+gem "gettext_i18n_rails_js", ">= 1.3"
+gem "sprockets", "~> 3.7"
+gem "kramdown", ">= 1.14"
+gem "uglifier", ">= 3"
+gem "byebug"
+EOF
+
+fi
+
+crm cluster init -y || true
+
+systemctl restart hawk hawk-backend
+
+git init
+git add .
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+git commit -m "Initial commit"
+
+
