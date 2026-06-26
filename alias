@@ -20,6 +20,10 @@ ob-16.0() {
   osc_build 16.0 16.0 $@
 }
 
+ob-16.1() {
+  osc_build 16.1 16.1 $@
+}
+
 ob-tw() {
   osc_build tw openSUSE_Tumbleweed $@
 }

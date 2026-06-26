@@ -1,4 +1,4 @@
-Basic helper (add to ~/.bashrc)
+Basic helper (add to ~/.bashrc or ~/.alias)
 ```
 myinstall() {
   for pkg in "$@"; do
